@@ -10,3 +10,8 @@
     height: 100vh;
     width: 100vw;
   }
+  @layer base {
+  :root {
+        --radius: 0.5rem;
+    }
+}
