@@ -1,9 +1,6 @@
-"use client";
-
-import React from "react";
+import React, { useState } from "react";
 import { cn } from "@/lib/utils";
 import { HandleProps } from "@xyflow/react";
-
 import { BaseHandle } from "@/components/base-handle";
 
 const flexDirections = {
@@ -24,23 +21,39 @@ const LabeledHandle = React.forwardRef<
 >(
   (
     { className, labelClassName, handleClassName, title, position, ...props },
-    ref,
-  ) => (
-    <div
-      ref={ref}
-      title={title}
-      className={cn(
-        "relative flex items-center ",
-        flexDirections[position],
-        className,
-      )}
-    >
-      <BaseHandle position={position} className={handleClassName} {...props} />
-      <label className={cn("px-3 text-neutral-950 dark:text-neutral-50", labelClassName)}>
-        {title}
-      </label>
-    </div>
-  ),
+    ref
+  ) => {
+    // State for the input value
+    const [label, setLabel] = useState(title);
+
+    // Handler for input changes
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+      setLabel(event.target.value);
+    };
+
+    return (
+      <div
+        ref={ref}
+        title={label} 
+        className={cn(
+          "relative flex items-center ",
+          flexDirections[position],
+          className
+        )}
+      >
+        <BaseHandle position={position} className={handleClassName} {...props} />
+        <input style={{background:"none"}}
+          className={cn(
+            "px-3 text-neutral-950  dark:text-neutral-50 w-20 overflow-x-clip border-none  outline-none",
+            labelClassName
+          )}
+          value={label} 
+          onChange={handleChange} 
+          type="text"
+        />
+      </div>
+    );
+  }
 );
 
 LabeledHandle.displayName = "LabeledHandle";

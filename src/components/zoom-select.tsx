@@ -51,11 +51,11 @@ const ZoomSelect = React.forwardRef<
   return (
     <Panel
       ref={ref}
-      className={cn("flex bg-neutral-50 text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50", className)}
+      className={cn("flex  text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50", className)}
       {...props}
     >
       <Select onValueChange={handleZoomChange}>
-        <SelectTrigger className="w-[140px] bg-neutral-50 dark:bg-neutral-900">
+        <SelectTrigger className="w-[140px] bg-blue-800 text-white font-medium  dark:bg-neutral-900 border-none outline-none">
           <SelectValue placeholder="Zoom" />
         </SelectTrigger>
         <SelectContent>
