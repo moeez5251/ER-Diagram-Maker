@@ -61,7 +61,22 @@ function App() {
     },
   ];
 
-  const defaultEdges = [];
+  const defaultEdges = [
+    {
+      id: "products-warehouses",
+      source: "1",
+      target: "2",
+      sourceHandle: "warehouse_id",
+      targetHandle: "id",
+    },
+    {
+      id: "products-suppliers",
+      source: "1",
+      target: "3",
+      sourceHandle: "supplier_id",
+      targetHandle: "id",
+    },
+  ];
 
   const nodeTypes = {
     databaseSchema: DatabaseSchemaNode,

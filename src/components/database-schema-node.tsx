@@ -25,26 +25,26 @@ export function DatabaseSchemaNode({
     // let  parent=event.target.parentElement.parentElement.parentElement.parentElement.parentElement;
     let parent = event.target.parentElement.parentElement.parentElement.parentElement;
     console.log(parent);
-    parent.remove();
+    parent.style.display="none";
 
   }
   const handleclick = (event: React.ChangeEvent<HTMLElement>) => {
     let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.value
     const newField = { title: "no-name", type: "text" };
-    countervalue.setNodes(prevNodes => 
-      prevNodes.map(node => 
-        node.data.label === parent  
+    countervalue.setNodes(prevNodes =>
+      prevNodes.map(node =>
+        node.data.label === parent
           ? {
-              ...node,  
-              data: {
-                ...node.data,  
-                schema: [
-                  ...node.data.schema,  
-                  newField  
-                ]
-              }
+            ...node,
+            data: {
+              ...node.data,
+              schema: [
+                ...node.data.schema,
+                newField
+              ]
             }
-          : node  
+          }
+          : node
       )
     );
   }
@@ -62,7 +62,7 @@ export function DatabaseSchemaNode({
             <TableRow key={uuidv4()} id={uuidv4()} className="relative text-xs hover:bg-cyan-400  ">
               <TableCell className="pl-0 pr-6 font-bold">
                 <LabeledHandle
-                  id={uuidv4()}
+                  id={entry.title}
                   title={entry.title}
                   type="target"
                   position={Position.Left}
@@ -117,8 +117,8 @@ export function DatabaseSchemaNode({
               </TableCell>
               <TableCell className="pr-0 text-center font-normal">
                 <LabeledHandle
-                  id={uuidv4()}
-                  title={entry.type}
+                  id={entry.title}
+                  title={entry.title}
                   type="source"
                   position={Position.Right}
                   className="p-0"
