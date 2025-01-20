@@ -5,7 +5,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { BaseNode } from "@/components/base-node";
 import { LabeledHandle } from "@/components/labeled-handle";
-import { CloudCog } from "lucide-react";
 type DatabaseSchemaNode = Node<{
   label: string;
   schema: { title: string; type: string }[];
@@ -19,18 +18,59 @@ export function DatabaseSchemaNode({
   const [label, setLabel] = useState(data.label);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    for (const nodes of countervalue.nodes) {
+      if (nodes.id === event.target.parentElement.parentElement.getAttribute("data-id")) {
+        nodes.data.label = event.target.value;
+      }
+    }
     setLabel(event.target.value);
   };
-  const handlerowclick = (event: React.ChangeEvent<HTMLElement>) => {
-    // let  parent=event.target.parentElement.parentElement.parentElement.parentElement.parentElement;
-    let parent = event.target.parentElement.parentElement.parentElement.parentElement;
-    console.log(parent);
-    parent.style.display="none";
-
+  const handlerowclick =async (event: React.ChangeEvent<HTMLElement>) => {
+    let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.value;
+    const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.value;
+    let index;
+  await  countervalue.setNodes(prevNodes =>
+      prevNodes.map(node => {
+        if (node.data.label === parent) {
+          // Find the index of the field to remove or modify
+          const index = node.data.schema.findIndex(field => field.title === targetnode);
+    
+          // If the schema has only one item, remove the whole node
+          if (node.data.schema.length === 1) {
+            return null; // Remove the node entirely
+          }
+    
+          // If the index is found and schema has more than 1 item, remove the item at the index
+          if (index !== -1) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                schema: [
+                  ...node.data.schema.slice(0, index),
+                  ...node.data.schema.slice(index + 1)
+                ]
+              }
+            };
+          }
+        }
+        return node; // Return unchanged node
+      }).filter(node => node !== null) // Remove any `null` nodes
+    );
+    console.log(countervalue.nodes);
   }
   const handleclick = (event: React.ChangeEvent<HTMLElement>) => {
     let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.value
+    const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.value
     const newField = { title: "no-name", type: "text" };
+    let index;
+    countervalue.nodes.map(node => {
+      if (node.data.label === parent) {
+        index = node.data.schema.findIndex(field => field.title === targetnode);
+      }
+      return null;
+    });
+
     countervalue.setNodes(prevNodes =>
       prevNodes.map(node =>
         node.data.label === parent
@@ -39,8 +79,9 @@ export function DatabaseSchemaNode({
             data: {
               ...node.data,
               schema: [
-                ...node.data.schema,
-                newField
+                ...node.data.schema.slice(0, index),
+                newField,
+                ...node.data.schema.slice(index)
               ]
             }
           }

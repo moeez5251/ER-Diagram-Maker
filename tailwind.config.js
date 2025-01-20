@@ -15,7 +15,7 @@ export default {
   		colors: {}
   	},
   	fontFamily: {
-  		'ubuntu': 'Roboto'
+  		'ubuntu': 'Nunito Sans'
   	}
   },
   plugins: [require("tailwindcss-animate")],

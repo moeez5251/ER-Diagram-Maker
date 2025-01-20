@@ -51,18 +51,18 @@ const ZoomSelect = React.forwardRef<
   return (
     <Panel
       ref={ref}
-      className={cn("flex  text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50", className)}
+      className={cn("flex  text-neutral-950 dark:bg-neutral-900 dark:text-neutral-50 font-ubuntu", className)}
       {...props}
     >
       <Select onValueChange={handleZoomChange}>
         <SelectTrigger className="w-[140px] bg-blue-800 text-white font-medium  dark:bg-neutral-900 border-none outline-none">
-          <SelectValue placeholder="Zoom" />
+          <SelectValue className="font-ubuntu font-semibold " placeholder="Zoom" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="best-fit">Best Fit</SelectItem>
+          <SelectItem className="font-ubuntu font-semibold" value="best-fit">Best Fit</SelectItem>
           <div className="mx-2 my-1 border-t" />
           {zoomLevels.map((level) => (
-            <SelectItem key={level} value={level}>
+            <SelectItem className="font-ubuntu font-semibold" key={level} value={level}>
               {`${(parseFloat(level) * 100).toFixed(0)}%`}
             </SelectItem>
           ))}
