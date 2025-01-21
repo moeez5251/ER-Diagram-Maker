@@ -25,22 +25,19 @@ export function DatabaseSchemaNode({
     }
     setLabel(event.target.value);
   };
-  const handlerowclick =async (event: React.ChangeEvent<HTMLElement>) => {
+  const handlerowclick = async (event: React.ChangeEvent<HTMLElement>) => {
     let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.value;
-    const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.value;
-    let index;
-  await  countervalue.setNodes(prevNodes =>
+    const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.innerHTML;
+    console.log(parent,targetnode);
+    await countervalue.setNodes(prevNodes =>
       prevNodes.map(node => {
         if (node.data.label === parent) {
-          // Find the index of the field to remove or modify
           const index = node.data.schema.findIndex(field => field.title === targetnode);
-    
-          // If the schema has only one item, remove the whole node
+
           if (node.data.schema.length === 1) {
-            return null; // Remove the node entirely
+            return null;
           }
-    
-          // If the index is found and schema has more than 1 item, remove the item at the index
+
           if (index !== -1) {
             return {
               ...node,
@@ -54,8 +51,8 @@ export function DatabaseSchemaNode({
             };
           }
         }
-        return node; // Return unchanged node
-      }).filter(node => node !== null) // Remove any `null` nodes
+        return node;
+      }).filter(node => node !== null) 
     );
     console.log(countervalue.nodes);
   }
@@ -107,6 +104,7 @@ export function DatabaseSchemaNode({
                   title={entry.title}
                   type="target"
                   position={Position.Left}
+                  className="record-name"
                 />
               </TableCell>
               <TableCell className="py-2 px-2 gap-3  text-center flex items-end justify-center font-normal cursor-pointer" >
@@ -165,6 +163,7 @@ export function DatabaseSchemaNode({
                   className="p-0"
                   handleClassName="p-0"
                   labelClassName="p-0"
+                  className="record-type"
                 />
               </TableCell>
 
