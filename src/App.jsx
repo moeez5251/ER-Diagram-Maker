@@ -4,7 +4,7 @@ import { ZoomSelect } from "@/components/zoom-select";
 import '@xyflow/react/dist/style.css';
 import { AnimatedSVGEdge } from './components/AnimatedSVG';
 import './App.css'
-import { useCallback ,useState} from 'react';
+import { useCallback, useState } from 'react';
 import { counter } from '../context/context';
 import { v4 as uuidv4 } from 'uuid';
 import { inputscounter } from '../context/context1';
@@ -42,9 +42,8 @@ function App() {
   const [nodes, setNodes] = useNodesState(defaultNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(defaultEdges);
   const [inp, setinp] = useState({
-    inputname:"",
-    inputtype:"",
-    index:false
+    inputname: "",
+    inputtype: "",
   })
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
@@ -54,7 +53,7 @@ function App() {
     type: 'animatedSvg',
 
   };
-
+  let oldname = {};
   const handleadding = () => {
     setNodes(
       [...nodes, {
@@ -70,9 +69,60 @@ function App() {
       }]
     )
   }
-  const inpchange=(e)=>{
-      setinp({...inp,[e.target.name]:e.target.value})
-      console.log(inp);
+  const inpchange = (e) => {
+    setinp({ ...inp, [e.target.name]: e.target.value })
+  }
+  const handleclick = () => {
+    const newField = { title: inp.inputname, type: inp.inputtype };
+
+    let index;
+    setNodes(prevNodes =>
+      prevNodes.map(node => {
+        if (node.data.label === inp.parent) {
+           index = node.data.schema.findIndex(field => field.title === inp.targetnode);
+
+
+          if (index !== -1) {
+            return {
+              ...node,
+              data: {
+                ...node.data,
+                schema: [
+                  ...node.data.schema.slice(0, index),
+                  ...node.data.schema.slice(index + 1)
+                ]
+              }
+            };
+          }
+        }
+        return node;
+      })
+    );
+  setNodes(prevNodes =>
+      prevNodes.map(node =>
+        node.data.label === inp.parent
+          ? {
+              ...node,
+              data: {
+                ...node.data,
+                schema: node.data.schema.length === 0
+                  ? [newField] // If schema is empty, add newField at 0th index
+                  : [
+                      ...node.data.schema.slice(0, index),
+                      newField,
+                      ...node.data.schema.slice(index)
+                    ]
+              }
+            }
+          : node
+      )
+    );
+    
+    console.log(nodes);
+    setinp({
+      inputname:"",
+      inputtype:""
+    })
   }
   return (
     <>
@@ -116,10 +166,7 @@ function App() {
                 </div>
 
               </div>
-              <div onClick={()=>{
-                console.log("clicked");
-                setinp({...inp,index:true})
-              }} className='cursor-pointer' title='save'>
+              <div onClick={handleclick} className='cursor-pointer' title='save'>
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
                   width={36}

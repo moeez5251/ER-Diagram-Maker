@@ -28,7 +28,6 @@ export function DatabaseSchemaNode({
   const handlerowclick = async (event: React.ChangeEvent<HTMLElement>) => {
     let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.value;
     const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.innerHTML;
-    console.log(parent,targetnode);
     await countervalue.setNodes(prevNodes =>
       prevNodes.map(node => {
         if (node.data.label === parent) {
@@ -54,7 +53,6 @@ export function DatabaseSchemaNode({
         return node;
       }).filter(node => node !== null) 
     );
-    console.log(countervalue.nodes);
   }
   const handleclick = (event: React.ChangeEvent<HTMLElement>) => {
     let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.value
@@ -157,7 +155,7 @@ export function DatabaseSchemaNode({
               <TableCell className="pr-0 text-center font-normal">
                 <LabeledHandle
                   id={entry.title}
-                  title={entry.title}
+                  title={entry.type}
                   type="source"
                   position={Position.Right}
                   className="p-0"

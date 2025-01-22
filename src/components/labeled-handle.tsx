@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect, useMemo } from "react";
+import React, { useContext, useState, useRef, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { HandleProps } from "@xyflow/react";
 import { BaseHandle } from "@/components/base-handle";
@@ -11,6 +11,7 @@ const flexDirections = {
   bottom: "flex-col-reverse justify-end",
   left: "flex-row",
 };
+
 
 const LabeledHandle = React.forwardRef<
   HTMLDivElement,
@@ -29,54 +30,26 @@ const LabeledHandle = React.forwardRef<
     const [ind, setind] = useState(false)
     const countervalue = useContext(counter)
     const countervalue1 = useContext(inputscounter)
-
-    useMemo(() => {
-      setind(!ind);
-      console.log("changed");
-    }
-      , [countervalue1.index])
-
-
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  
+   
+    const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
       const parentelement = event.target.parentElement.parentElement.parentElement;
       const name = parentelement.firstElementChild.firstElementChild.getAttribute("title");
       const type = parentelement.lastElementChild.firstElementChild.getAttribute("title");
-      countervalue1.setinp({
+      
+      let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.firstElementChild.value;
+      const targetnode = event.target.parentElement.lastElementChild.innerHTML;
+      console.log(parent,targetnode);
+      countervalue1.setinp((prev) => ({
+        ...prev,
         inputname: name,
-        inputtype: type
-      })
+        inputtype: type,
+        parent:parent,
+        targetnode:targetnode
+      }));
 
-      let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.firstElementChild.value
-      const targetnode = event.target.parentElement.parentElement.parentElement.firstElementChild.firstElementChild.lastElementChild.innerHTML
-      const newField = { title: "no-name", type: "text" };
-      let index;
-      countervalue.nodes.map(node => {
-        if (node.data.label === parent) {
-          index = node.data.schema.findIndex(field => field.title === targetnode);
-        }
-        return null;
-      });
-      console.log(parent, targetnode, index, countervalue.nodes);
-      console.log(ind);
-      // countervalue.setNodes(prevNodes =>
-      //   prevNodes.map(node =>
-      //     node.data.label === parent
-      //       ? {
-      //         ...node,
-      //         data: {
-      //           ...node.data,
-      //           schema: [
-      //             ...node.data.schema.slice(0, index),
-      //             newField,
-      //             ...node.data.schema.slice(index)
-      //           ]
-      //         }
-      //       }
-      //       : node
-      //   )
-      // );
     };
-
+    
     return (
       <div
         ref={ref}
