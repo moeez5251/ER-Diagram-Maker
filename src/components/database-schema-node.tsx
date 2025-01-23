@@ -1,11 +1,12 @@
 import { counter } from "../../context/context"
-import { useContext, useRef, useState } from "react";
+import { useContext, useRef, useState, useEffect } from "react";
 import { Node, NodeProps, Position } from "@xyflow/react";
 import { v4 as uuidv4 } from 'uuid';
 import { TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { BaseNode } from "@/components/base-node";
 import { LabeledHandle } from "@/components/labeled-handle";
 type DatabaseSchemaNode = Node<{
+  id: string
   label: string;
   schema: { title: string; type: string }[];
 }>;
@@ -13,10 +14,12 @@ type DatabaseSchemaNode = Node<{
 export function DatabaseSchemaNode({
   data,
   selected,
+  id,
+  positionAbsoluteX,
+  positionAbsoluteY
 }: NodeProps<DatabaseSchemaNode>) {
   const countervalue = useContext(counter)
   const [label, setLabel] = useState(data.label);
-
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     for (const nodes of countervalue.nodes) {
       if (nodes.id === event.target.parentElement.parentElement.getAttribute("data-id")) {
@@ -24,13 +27,15 @@ export function DatabaseSchemaNode({
       }
     }
     setLabel(event.target.value);
+    localStorage.setItem("data-sets", JSON.stringify(countervalue.nodes))
   };
   const handlerowclick = async (event: React.ChangeEvent<HTMLElement>) => {
-    let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.value;
+    let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.id;
     const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.innerHTML;
+    console.log(parent);
     await countervalue.setNodes(prevNodes =>
       prevNodes.map(node => {
-        if (node.data.label === parent) {
+        if (node.id === parent) {
           const index = node.data.schema.findIndex(field => field.title === targetnode);
 
           if (node.data.schema.length === 1) {
@@ -51,16 +56,26 @@ export function DatabaseSchemaNode({
           }
         }
         return node;
-      }).filter(node => node !== null) 
+      }).filter(node => node !== null)
     );
+    let a = JSON.parse(localStorage.getItem("data-sets"));
+    console.log(a.length);
+    if (a.length === 1) {
+      localStorage.clear();
+    }
+    else {
+
+      localStorage.setItem("data-sets", JSON.stringify(countervalue.nodes))
+    }
+
   }
   const handleclick = (event: React.ChangeEvent<HTMLElement>) => {
-    let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.value
+    let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.id
     const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.value
     const newField = { title: "no-name", type: "text" };
     let index;
     countervalue.nodes.map(node => {
-      if (node.data.label === parent) {
+      if (node.id === parent) {
         index = node.data.schema.findIndex(field => field.title === targetnode);
       }
       return null;
@@ -68,7 +83,7 @@ export function DatabaseSchemaNode({
 
     countervalue.setNodes(prevNodes =>
       prevNodes.map(node =>
-        node.data.label === parent
+        node.id === parent
           ? {
             ...node,
             data: {
@@ -83,14 +98,43 @@ export function DatabaseSchemaNode({
           : node
       )
     );
+    localStorage.setItem("data-sets", JSON.stringify(countervalue.nodes))
   }
+  useEffect(() => {
+    if (positionAbsoluteX) {
+      console.log(positionAbsoluteX, positionAbsoluteY);
+
+      countervalue.setNodes(prevNodes =>
+        prevNodes.map(node =>
+          node.id === id
+            ? {
+              ...node,
+              position: {
+
+                x: positionAbsoluteX.toFixed(2),
+                y: positionAbsoluteY.toFixed(2)
+              }
+            }
+            : node
+        )
+      );
+    }
+    localStorage.setItem("data-sets", JSON.stringify(countervalue.nodes))
+
+    return () => {
+
+    }
+  }, [positionAbsoluteX])
+
+
   return (
     <BaseNode className="p-0" selected={selected}>
       <input
         onChange={handleChange}
-        className="rounded-tl-md rounded-tr-md bg-blue-800 p-2 text-center text-sm text-white dark:bg-neutral-800 dark:text-neutral-400 w-full border-none outline-none cursor-grab focus:bg-blue-900 cursor-pointer"
+        className="rounded-tl-md rounded-tr-md bg-blue-800 p-2 text-center text-sm text-white dark:bg-neutral-800 dark:text-neutral-400 w-full border-none outline-none cursor-grab focus:bg-blue-900 cursor-pointer inputs"
         type="text"
         value={label}
+        id={id}
       />
       <table className="border-spacing-10 overflow-visible">
         <TableBody>

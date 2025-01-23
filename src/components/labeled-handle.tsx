@@ -2,7 +2,6 @@ import React, { useContext, useState, useRef, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { HandleProps } from "@xyflow/react";
 import { BaseHandle } from "@/components/base-handle";
-import { counter } from "../../context/context"
 import { inputscounter } from "../../context/context1"
 
 const flexDirections = {
@@ -27,8 +26,6 @@ const LabeledHandle = React.forwardRef<
     ref
   ) => {
     const [label, setLabel] = useState(title);
-    const [ind, setind] = useState(false)
-    const countervalue = useContext(counter)
     const countervalue1 = useContext(inputscounter)
   
    
@@ -37,7 +34,7 @@ const LabeledHandle = React.forwardRef<
       const name = parentelement.firstElementChild.firstElementChild.getAttribute("title");
       const type = parentelement.lastElementChild.firstElementChild.getAttribute("title");
       
-      let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.firstElementChild.value;
+      let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.firstElementChild.id;
       const targetnode = event.target.parentElement.lastElementChild.innerHTML;
       console.log(parent,targetnode);
       countervalue1.setinp((prev) => ({

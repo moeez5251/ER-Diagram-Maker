@@ -1,10 +1,10 @@
-import { ReactFlow, MiniMap, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
+import { ReactFlow, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
 import { DatabaseSchemaNode } from "@/components/database-schema-node";
 import { ZoomSelect } from "@/components/zoom-select";
 import '@xyflow/react/dist/style.css';
 import { AnimatedSVGEdge } from './components/AnimatedSVG';
 import './App.css'
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { counter } from '../context/context';
 import { v4 as uuidv4 } from 'uuid';
 import { inputscounter } from '../context/context1';
@@ -19,20 +19,7 @@ function App() {
   ];
 
   const defaultEdges = [
-    {
-      id: "products-warehouses",
-      source: "1",
-      target: "2",
-      sourceHandle: "warehouse_id",
-      targetHandle: "id",
-    },
-    {
-      id: "products-suppliers",
-      source: "1",
-      target: "3",
-      sourceHandle: "supplier_id",
-      targetHandle: "id",
-    },
+
   ];
 
   const nodeTypes = {
@@ -53,7 +40,6 @@ function App() {
     type: 'animatedSvg',
 
   };
-  let oldname = {};
   const handleadding = () => {
     setNodes(
       [...nodes, {
@@ -68,18 +54,23 @@ function App() {
         },
       }]
     )
+    localStorage.setItem("data-sets", JSON.stringify(nodes))
   }
   const inpchange = (e) => {
     setinp({ ...inp, [e.target.name]: e.target.value })
   }
   const handleclick = () => {
+
+    if (inp.inputname.trim() === "" || inp.inputtype.trim() === "") {
+      return;
+    }
     const newField = { title: inp.inputname, type: inp.inputtype };
 
     let index;
     setNodes(prevNodes =>
       prevNodes.map(node => {
-        if (node.data.label === inp.parent) {
-           index = node.data.schema.findIndex(field => field.title === inp.targetnode);
+        if (node.id === inp.parent) {
+          index = node.data.schema.findIndex(field => field.title === inp.targetnode);
 
 
           if (index !== -1) {
@@ -98,32 +89,44 @@ function App() {
         return node;
       })
     );
-  setNodes(prevNodes =>
+    setNodes(prevNodes =>
       prevNodes.map(node =>
-        node.data.label === inp.parent
+        node.id === inp.parent
           ? {
-              ...node,
-              data: {
-                ...node.data,
-                schema: node.data.schema.length === 0
-                  ? [newField] // If schema is empty, add newField at 0th index
-                  : [
-                      ...node.data.schema.slice(0, index),
-                      newField,
-                      ...node.data.schema.slice(index)
-                    ]
-              }
+            ...node,
+            data: {
+              ...node.data,
+              schema: node.data.schema.length === 0
+                ? [newField]
+                : [
+                  ...node.data.schema.slice(0, index),
+                  newField,
+                  ...node.data.schema.slice(index)
+                ]
             }
+          }
           : node
       )
     );
-    
-    console.log(nodes);
+    localStorage.setItem("data-sets", JSON.stringify(nodes))
     setinp({
-      inputname:"",
-      inputtype:""
+      inputname: "",
+      inputtype: ""
     })
   }
+
+
+  useEffect(() => {
+
+    let a = JSON.parse(localStorage.getItem("data-sets"));
+    if(a){
+      setNodes(a)
+    }
+   
+    return () => {
+    }
+  }, [])
+
   return (
     <>
       <inputscounter.Provider value={{ inp, setinp }}>
@@ -166,25 +169,22 @@ function App() {
                 </div>
 
               </div>
-              <div onClick={handleclick} className='cursor-pointer' title='save'>
+              <button onClick={handleclick}
+                className="flex justify-center gap-2 items-center shadow-xl text-lg bg-gray-50 backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-blue-800 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-3 py-2 overflow-hidden border-2 rounded-full group"
+              >
+                Save
                 <svg
+                  className="w-8 h-8 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-gray-50 ease-linear duration-300 rounded-full border border-gray-700 group-hover:border-none p-2 rotate-45"
+                  viewBox="0 0 16 19"
                   xmlns="http://www.w3.org/2000/svg"
-                  width={36}
-                  height={36}
-                  fill="none"
-                  className="injected-svg"
-                  color="#151715"
-                  data-src="https://cdn.hugeicons.com/icons/bookmark-03-solid-rounded.svg"
-                  viewBox="0 0 24 24"
                 >
                   <path
-                    fill="#151715"
-                    fillRule="evenodd"
-                    d="M20.24 2.963c-.818-.908-1.867-1.324-3.191-1.522-1.281-.19-2.918-.19-4.986-.19h-.126c-2.068 0-3.705 0-4.986.19-1.324.198-2.373.614-3.19 1.522-.807.897-1.168 2.03-1.34 3.46-.171 1.407-.171 3.212-.171 5.525s0 4.222.17 5.629c.173 1.431.534 2.564 1.34 3.46.818.908 1.867 1.324 3.191 1.522 1.281.191 2.918.191 4.987.191h.124c2.069 0 3.706 0 4.987-.191 1.323-.198 2.373-.614 3.19-1.521.807-.897 1.168-2.03 1.34-3.461.171-1.407.171-3.316.171-5.629 0-2.313 0-4.118-.17-5.524-.173-1.432-.534-2.564-1.34-3.461ZM12 2.961c1.289 0 2.354 0 3.25.039v6.826c0 .648-.015 1.129-.054 1.403a2.622 2.622 0 0 1-.6-.325c-.531-.417-1.66-1.276-1.922-1.38A1.46 1.46 0 0 0 12 9.349c-.269 0-.49.083-.674.177-.27.105-1.394.963-1.923 1.379-.243.166-.441.273-.588.321-.04-.274-.065-.75-.065-1.399V3c.896-.038 1.961-.039 3.25-.039Z"
-                    clipRule="evenodd"
-                  />
+                    d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
+                    className="fill-gray-800 group-hover:fill-gray-800"
+                  ></path>
                 </svg>
-              </div>
+              </button>
+
             </div>
             <div style={{ boxShadow: "inset 0px 0px 7px 1px rgb(170 170 187)" }} className=' drop-shadow-md blur-0 w-11/12 h-[80%]  mx-auto relative top-28 rounded-xl'>
 
@@ -201,7 +201,6 @@ function App() {
                   fitView
                 >
                   <ZoomSelect />
-                  <MiniMap />
                 </ReactFlow>
               </div>
               <div className='flex absolute right-8 -top-8 gap-5'>
