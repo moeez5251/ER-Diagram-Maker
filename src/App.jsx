@@ -114,25 +114,55 @@ function App() {
       inputtype: ""
     })
   }
-
-
   useEffect(() => {
 
     let a = JSON.parse(localStorage.getItem("data-sets"));
-    if(a){
+    let b = JSON.parse(localStorage.getItem("edges-data"));
+
+    if (a) {
       setNodes(a)
+
     }
-   
+    if (a.length === 0) {
+      setEdges([])
+    }
+    else
+      if (b) {
+        setEdges(b);
+      }
+
     return () => {
+
     }
   }, [])
+
+  useEffect(() => {
+    setTimeout(() => {
+      localStorage.setItem("data-sets", JSON.stringify(nodes))
+    }, 50);
+
+    return () => {
+
+    }
+  }, [nodes])
+
+  useEffect(() => {
+    console.log("change");
+    setTimeout(() => {
+      localStorage.setItem("edges-data", JSON.stringify(edges))
+    }, 50);
+
+    return () => {
+
+    }
+  }, [edges])
 
   return (
     <>
       <inputscounter.Provider value={{ inp, setinp }}>
         <counter.Provider value={{ nodes, setNodes }}>
           <div className='bg-[#efedf5] w-full h-full font-ubuntu font-normal'>
-            <div className='flex absolute items-end w-full  mx-8  gap-6 top-3 '>
+            <div className='flex absolute items-end w-3/6 sm:w-5/6  mx-8  gap-6 top-3  '>
               <div>
                 <div>
                   <label className="block text-gray-800 font-semibold text-sm w-fit"
@@ -151,7 +181,7 @@ function App() {
                 </div>
 
               </div>
-              <div>
+              <div className='flex items-end gap-4'>
                 <div>
                   <label className="block text-gray-800 font-semibold text-sm w-fit"
                   >Input Data Type</label
@@ -166,7 +196,6 @@ function App() {
                       value={inp.inputtype}
                     />
                   </div>
-                </div>
 
               </div>
               <button onClick={handleclick}
@@ -174,7 +203,7 @@ function App() {
               >
                 Save
                 <svg
-                  className="w-8 h-8 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-gray-50 ease-linear duration-300 rounded-full border border-gray-700 group-hover:border-none p-2 rotate-45"
+                  className="w-8 h-8 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-gray-50 ease-linear duration-300 rounded-full border border-gray-700 group-hover:border-none p-2 rotate-45 hidden md:block"
                   viewBox="0 0 16 19"
                   xmlns="http://www.w3.org/2000/svg"
                 >
@@ -184,6 +213,7 @@ function App() {
                   ></path>
                 </svg>
               </button>
+                </div>
 
             </div>
             <div style={{ boxShadow: "inset 0px 0px 7px 1px rgb(170 170 187)" }} className=' drop-shadow-md blur-0 w-11/12 h-[80%]  mx-auto relative top-28 rounded-xl'>

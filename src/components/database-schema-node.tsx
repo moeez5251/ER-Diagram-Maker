@@ -27,12 +27,10 @@ export function DatabaseSchemaNode({
       }
     }
     setLabel(event.target.value);
-    localStorage.setItem("data-sets", JSON.stringify(countervalue.nodes))
   };
   const handlerowclick = async (event: React.ChangeEvent<HTMLElement>) => {
     let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.id;
     const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.innerHTML;
-    console.log(parent);
     await countervalue.setNodes(prevNodes =>
       prevNodes.map(node => {
         if (node.id === parent) {
@@ -58,15 +56,6 @@ export function DatabaseSchemaNode({
         return node;
       }).filter(node => node !== null)
     );
-    let a = JSON.parse(localStorage.getItem("data-sets"));
-    console.log(a.length);
-    if (a.length === 1) {
-      localStorage.clear();
-    }
-    else {
-
-      localStorage.setItem("data-sets", JSON.stringify(countervalue.nodes))
-    }
 
   }
   const handleclick = (event: React.ChangeEvent<HTMLElement>) => {
@@ -101,9 +90,10 @@ export function DatabaseSchemaNode({
     localStorage.setItem("data-sets", JSON.stringify(countervalue.nodes))
   }
   useEffect(() => {
+    if(NaN){
+      return;
+    }
     if (positionAbsoluteX) {
-      console.log(positionAbsoluteX, positionAbsoluteY);
-
       countervalue.setNodes(prevNodes =>
         prevNodes.map(node =>
           node.id === id
