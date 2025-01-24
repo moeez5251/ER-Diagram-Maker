@@ -8,7 +8,7 @@ import { LabeledHandle } from "@/components/labeled-handle";
 type DatabaseSchemaNode = Node<{
   id: string
   label: string;
-  schema: { title: string; type: string }[];
+  schema: { title: string; type: string,id:string }[];
 }>;
 
 export function DatabaseSchemaNode({
@@ -61,7 +61,8 @@ export function DatabaseSchemaNode({
   const handleclick = (event: React.ChangeEvent<HTMLElement>) => {
     let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.id
     const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.value
-    const newField = { title: "no-name", type: "text" };
+    let id=event.target.parentElement.parentElement.parentElement.parentElement.id;
+    const newField = { title: "no-name", type: "text",id:uuidv4()};
     let index;
     countervalue.nodes.map(node => {
       if (node.id === parent) {
@@ -116,7 +117,6 @@ export function DatabaseSchemaNode({
     }
   }, [positionAbsoluteX])
 
-
   return (
     <BaseNode className="p-0" selected={selected}>
       <input
@@ -129,7 +129,7 @@ export function DatabaseSchemaNode({
       <table className="border-spacing-10 overflow-visible">
         <TableBody>
           {data.schema.map((entry) => (
-            <TableRow key={uuidv4()} id={uuidv4()} className="relative text-xs hover:bg-cyan-400  ">
+            <TableRow key={uuidv4()} id={entry.id} className="relative text-xs hover:bg-cyan-400  ">
               <TableCell className="pl-0 pr-6 font-bold">
                 <LabeledHandle
                   id={entry.title}

@@ -35,7 +35,8 @@ const LabeledHandle = React.forwardRef<
       const type = parentelement.lastElementChild.firstElementChild.getAttribute("title");
       
       let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.firstElementChild.id;
-      const targetnode = event.target.parentElement.lastElementChild.innerHTML;
+      const targetnode = event.target.parentElement.parentElement.parentElement.id;
+      console.log(parent,targetnode);
       countervalue1.setinp((prev) => ({
         ...prev,
         inputname: name,
@@ -45,7 +46,6 @@ const LabeledHandle = React.forwardRef<
       }));
 
     };
-    
     return (
       <div
         ref={ref}
