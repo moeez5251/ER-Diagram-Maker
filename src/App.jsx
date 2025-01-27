@@ -49,12 +49,12 @@ function App() {
         data: {
           label: "db",
           schema: [
-            { title: "any_name", type: "text", id: uuidv4() },
+            { title: "any_name", id: uuidv4() },
           ],
         },
       }]
     )
-    localStorage.setItem("data-sets", JSON.stringify(nodes))
+    // localStorage.setItem("data-sets", JSON.stringify(nodes))
   }
   const inpchange = (e) => {
     setinp({ ...inp, [e.target.name]: e.target.value })
@@ -106,7 +106,7 @@ function App() {
           : node
       )
     );
-    localStorage.setItem("data-sets", JSON.stringify(nodes))
+    // localStorage.setItem("data-sets", JSON.stringify(nodes))
     setinp({
       inputname: "",
       inputtype: ""
@@ -130,25 +130,22 @@ function App() {
   }, [])
 
   useEffect(() => {
-    setTimeout(() => {
-      localStorage.setItem("data-sets", JSON.stringify(nodes))
-    }, 50);
-
+    // setTimeout(() => {
+    //   localStorage.setItem("data-sets", JSON.stringify(nodes))
+    // }, 50);
+    console.log(nodes);
     return () => {
 
     }
   }, [nodes])
 
-  useEffect(() => {
-    console.log("change");
-    setTimeout(() => {
-      localStorage.setItem("edges-data", JSON.stringify(edges))
-    }, 50);
+  // useEffect(() => {
+  //       localStorage.setItem("edges-data", JSON.stringify(edges))
 
-    return () => {
+  //   return () => {
 
-    }
-  }, [edges])
+  //   }
+  // }, [edges])
 
   return (
     <>
@@ -209,7 +206,7 @@ function App() {
               </div>
 
             </div>
-            <div style={{ boxShadow: "inset 0px 0px 7px 1px rgb(170 170 187)" }} className=' drop-shadow-md blur-0 w-11/12 h-[80%]  mx-auto relative top-28 rounded-xl'>
+            <div style={{ boxShadow: "inset rgb(167 167 167 / 54%) 0px -7px 20px 0px" }} className=' drop-shadow-md blur-0 w-11/12 h-[80%]  mx-auto relative top-28 rounded-xl'>
 
               <div style={{ height: '100%', width: "100%" }}>
                 <ReactFlow

@@ -50,16 +50,18 @@ const LabeledHandle = React.forwardRef<
       <div
         ref={ref}
         title={label}
+        style={{boxShadow:"inset 1px 1px 6px 0px #7a7a7a"}}
         className={cn(
-          "relative flex items-center ",
+          "relative flex items-center  flex-row-reverse mx-2 py-1 px-2 my-1 rounded-lg",
           flexDirections[position],
           className
         )}
       >
         <BaseHandle position={position} className={handleClassName} {...props} />
+        <BaseHandle position="left" className={handleClassName} {...props} />
         <div style={{ background: "none" }}
           className={cn(
-            "px-3 text-neutral-950  dark:text-neutral-50 w-20 overflow-x-clip border-none  outline-none",
+            "",
             labelClassName
           )}
           onClick={handleChange}

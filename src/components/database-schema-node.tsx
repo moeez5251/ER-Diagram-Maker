@@ -8,7 +8,7 @@ import { LabeledHandle } from "@/components/labeled-handle";
 type DatabaseSchemaNode = Node<{
   id: string
   label: string;
-  schema: { title: string; type: string,id:string }[];
+  schema: { title: string; type: string, id: string }[];
 }>;
 
 export function DatabaseSchemaNode({
@@ -29,69 +29,96 @@ export function DatabaseSchemaNode({
     setLabel(event.target.value);
   };
   const handlerowclick = async (event: React.ChangeEvent<HTMLElement>) => {
-    let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.id;
-    const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.innerHTML;
-    await countervalue.setNodes(prevNodes =>
-      prevNodes.map(node => {
-        if (node.id === parent) {
-          const index = node.data.schema.findIndex(field => field.title === targetnode);
+    // let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.id;
+    // const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.innerHTML;
+    // await countervalue.setNodes(prevNodes =>
+    //   prevNodes.map(node => {
+    //     if (node.id === parent) {
+    //       const index = node.data.schema.findIndex(field => field.title === targetnode);
 
-          if (node.data.schema.length === 1) {
-            return null;
-          }
+    //       if (node.data.schema.length === 1) {
+    //         return null;
+    //       }
 
-          if (index !== -1) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                schema: [
-                  ...node.data.schema.slice(0, index),
-                  ...node.data.schema.slice(index + 1)
-                ]
-              }
-            };
-          }
-        }
-        return node;
-      }).filter(node => node !== null)
-    );
+    // if (index !== -1) {
+    //   return {
+    //     ...node,
+    //     data: {
+    //       ...node.data,
+    //       schema: [
+    //         ...node.data.schema.slice(0, index),
+    //         ...node.data.schema.slice(index + 1)
+    //       ]
+    //     }
+    //   };
+    // }
+    //   }
+    //   return node;
+    // }).filter(node => node !== null)
+    // );
+    const rowid = event.target.parentElement.parentElement.parentElement.parentElement.id;
+    for (const index of countervalue.nodes) {
+      let a = index.data.schema.findIndex(field => field.id === rowid);
+      if (a || a === 0) {
+        countervalue.setNodes(prevNodes =>
+          prevNodes.map(node => {
+            if (node.data.schema.length === 1) {
+              return null;
+            }
 
+            if (index !== -1) {
+              return {
+                ...node,
+                data: {
+                  ...node.data,
+                  schema: [
+                    ...node.data.schema.slice(0, index),
+                    ...node.data.schema.slice(index + 1)
+                  ]
+                }
+              };
+            }
+            return node;
+
+          }).filter(node => node !== null)
+        );
+        return;
+      }
+    }
   }
   const handleclick = (event: React.ChangeEvent<HTMLElement>) => {
-    let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.id
-    const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.value
-    let id=event.target.parentElement.parentElement.parentElement.parentElement.id;
-    const newField = { title: "no-name", type: "text",id:uuidv4()};
-    let index;
-    countervalue.nodes.map(node => {
-      if (node.id === parent) {
-        index = node.data.schema.findIndex(field => field.title === targetnode);
+    const newField = { title: "no-name", id: uuidv4() };
+    const rowid = event.target.parentElement.parentElement.parentElement.parentElement.id;
+    for (const index of countervalue.nodes) {
+      let a = index.data.schema.findIndex(field => field.id === rowid);
+      if (a || a === 0) {
+        countervalue.setNodes(prevNodes =>
+          prevNodes.map(node =>
+            node.id === id
+              ? {
+                ...node,
+                data: {
+                  ...node.data,
+                  schema: [
+                    ...node.data.schema.slice(0, a),
+                    newField,
+                    ...node.data.schema.slice(a)
+                  ]
+                }
+              }
+              : node
+          )
+        );
+        return;
       }
-      return null;
-    });
-
-    countervalue.setNodes(prevNodes =>
-      prevNodes.map(node =>
-        node.id === parent
-          ? {
-            ...node,
-            data: {
-              ...node.data,
-              schema: [
-                ...node.data.schema.slice(0, index),
-                newField,
-                ...node.data.schema.slice(index)
-              ]
-            }
-          }
-          : node
-      )
-    );
-    localStorage.setItem("data-sets", JSON.stringify(countervalue.nodes))
+    }
   }
+  // const handlemore=(e)=>{
+  //   const targetElement = document.getElementById(e.target.getAttribute("data-id"));
+  //   targetElement.style.right = "50px";
+  // }
   useEffect(() => {
-    if(NaN){
+    if (NaN) {
       return;
     }
     if (positionAbsoluteX) {
@@ -110,37 +137,59 @@ export function DatabaseSchemaNode({
         )
       );
     }
-    localStorage.setItem("data-sets", JSON.stringify(countervalue.nodes))
-
     return () => {
 
     }
   }, [positionAbsoluteX])
-
   return (
-    <BaseNode className="p-0" selected={selected}>
-      <input
-        onChange={handleChange}
-        className="rounded-tl-md rounded-tr-md bg-blue-800 p-2 text-center text-sm text-white dark:bg-neutral-800 dark:text-neutral-400 w-full border-none outline-none cursor-grab focus:bg-blue-900 cursor-pointer inputs"
-        type="text"
-        value={label}
-        id={id}
-      />
-      <table className="border-spacing-10 overflow-visible">
+    <BaseNode className="bg-gray-200 py-2 rounded-md w-44 relative before:w-1 before:h-6 before:bg-orange-800  before:z-10 before:absolute before:block before:rounded-lg before:left-[0.5px] before:top-[7px] shadow-lg " selected={selected}>
+      <div className="flex items-center px-3 w-full">
+
+        <input
+          onChange={handleChange}
+          onClick={() => console.log(selected)}
+          className="bg-transparent font-bold border-none outline-none text-sm w-[90%] "
+          type="text"
+          value={"produts"}
+          id={id}
+        />
+        <div className="cursor-pointer">
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            width={16}
+            height={16}
+            fill="none"
+            className="injected-svg"
+            color="#000"
+            data-src="https://cdn.hugeicons.com/icons/more-horizontal-circle-01-solid-standard.svg"
+            viewBox="0 0 24 24"
+          >
+            <path
+              fill="#000"
+              d="M17 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0ZM9.5 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0ZM2 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0Z"
+            />
+          </svg>
+        </div>
+      </div>
+      <table className="border-spacing-10  w-full overflow-hidden">
         <TableBody>
           {data.schema.map((entry) => (
-            <TableRow key={uuidv4()} id={entry.id} className="relative text-xs hover:bg-cyan-400  ">
-              <TableCell className="pl-0 pr-6 font-bold">
+            <TableRow key={uuidv4()} id={entry.id} className=" text-xs overflow-hidden m-2 relative transition-all right-0 ">
+
+              <TableCell className="w-[95%]"  >
                 <LabeledHandle
                   id={entry.title}
                   title={entry.title}
-                  type="target"
-                  position={Position.Left}
-                  className="record-name"
+                  type="source"
+                  position={Position.Right}
+                  handleClassName="p-0"
+                  labelClassName="p-0"
+                  className="record-type"
                 />
               </TableCell>
-              <TableCell className="py-2 px-2 gap-3  text-center flex items-end justify-center font-normal cursor-pointer" >
-                <div onClick={handlerowclick} title="remove record" >
+              <TableCell className="absolute -right-10 gap-2 flex items-center h-full " >
+                <div className="cursor-pointer" onClick={handlerowclick} title="remove record" >
 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -165,7 +214,7 @@ export function DatabaseSchemaNode({
                     />
                   </svg>
                 </div>
-                <div onClick={handleclick} title="add record" >
+                <div className="cursor-pointer " onClick={handleclick} title="add record" >
 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -186,17 +235,25 @@ export function DatabaseSchemaNode({
                   </svg>
                 </div>
               </TableCell>
-              <TableCell className="pr-0 text-center font-normal">
-                <LabeledHandle
-                  id={entry.title}
-                  title={entry.type}
-                  type="source"
-                  position={Position.Right}
-                  className="p-0"
-                  handleClassName="p-0"
-                  labelClassName="p-0"
-                  className="record-type"
-                />
+              <TableCell className="cursor-pointer mx-3"  onClick={(e)=>handlemore(e)} >
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg"
+                  width={16}
+                  height={16}
+                  fill="none"
+                  className="injected-svg"
+                  color="#000"
+                  data-src="https://cdn.hugeicons.com/icons/more-vertical-circle-02-solid-standard.svg"
+                  viewBox="0 0 24 24"
+                >
+                  <path 
+                   data-id={entry.id}
+                    fill="#000"
+                    fillRule="evenodd"
+                    d="M12 22.75C6.063 22.75 1.25 17.937 1.25 12S6.063 1.25 12 1.25 22.75 6.063 22.75 12 17.937 22.75 12 22.75Zm0-16a1.25 1.25 0 1 0 0 2.5h.009a1.25 1.25 0 0 0 0-2.5H12Zm0 4a1.25 1.25 0 1 0 0 2.5h.009a1.25 1.25 0 0 0 0-2.5H12Zm0 4a1.25 1.25 0 1 0 0 2.5h.009a1.25 1.25 0 0 0 0-2.5H12Z"
+                    clipRule="evenodd"
+                  />
+                </svg>
               </TableCell>
 
             </TableRow>
