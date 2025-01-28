@@ -29,60 +29,33 @@ export function DatabaseSchemaNode({
     setLabel(event.target.value);
   };
   const handlerowclick = async (event: React.ChangeEvent<HTMLElement>) => {
-    // let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.id;
-    // const targetnode = event.target.parentElement.parentElement.parentElement.parentElement.firstChild.firstChild.lastChild.innerHTML;
-    // await countervalue.setNodes(prevNodes =>
-    //   prevNodes.map(node => {
-    //     if (node.id === parent) {
-    //       const index = node.data.schema.findIndex(field => field.title === targetnode);
-
-    //       if (node.data.schema.length === 1) {
-    //         return null;
-    //       }
-
-    // if (index !== -1) {
-    //   return {
-    //     ...node,
-    //     data: {
-    //       ...node.data,
-    //       schema: [
-    //         ...node.data.schema.slice(0, index),
-    //         ...node.data.schema.slice(index + 1)
-    //       ]
-    //     }
-    //   };
-    // }
-    //   }
-    //   return node;
-    // }).filter(node => node !== null)
-    // );
     const rowid = event.target.parentElement.parentElement.parentElement.parentElement.id;
     for (const index of countervalue.nodes) {
       let a = index.data.schema.findIndex(field => field.id === rowid);
-      if (a || a === 0) {
+      if (a !== -1) {
         countervalue.setNodes(prevNodes =>
           prevNodes.map(node => {
-            if (node.data.schema.length === 1) {
-              return null;
-            }
+            if (node.id === id) {
 
-            if (index !== -1) {
+              if (node.data.schema.length === 1) {
+                return null;
+              }
+
               return {
                 ...node,
                 data: {
                   ...node.data,
                   schema: [
-                    ...node.data.schema.slice(0, index),
-                    ...node.data.schema.slice(index + 1)
+                    ...node.data.schema.slice(0, a),
+                    ...node.data.schema.slice(a + 1)
                   ]
                 }
               };
             }
             return node;
-
           }).filter(node => node !== null)
         );
-        return;
+
       }
     }
   }
@@ -113,10 +86,11 @@ export function DatabaseSchemaNode({
       }
     }
   }
-  // const handlemore=(e)=>{
-  //   const targetElement = document.getElementById(e.target.getAttribute("data-id"));
-  //   targetElement.style.right = "50px";
-  // }
+  const handlemore = (e) => {
+    if (document.getElementById(e.target.getAttribute("data-id"))) {
+      document.getElementById(e.target.getAttribute("data-id")).classList.toggle("right-animate")
+    }
+  }
   useEffect(() => {
     if (NaN) {
       return;
@@ -179,9 +153,10 @@ export function DatabaseSchemaNode({
 
               <TableCell className="w-[95%]"  >
                 <LabeledHandle
-                  id={entry.title}
+                  id={entry.id}
                   title={entry.title}
                   type="source"
+                  
                   position={Position.Right}
                   handleClassName="p-0"
                   labelClassName="p-0"
@@ -214,7 +189,7 @@ export function DatabaseSchemaNode({
                     />
                   </svg>
                 </div>
-                <div className="cursor-pointer " onClick={handleclick} title="add record" >
+                <div className="cursor-pointer" onClick={handleclick} title="add record" >
 
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -235,25 +210,29 @@ export function DatabaseSchemaNode({
                   </svg>
                 </div>
               </TableCell>
-              <TableCell className="cursor-pointer mx-3"  onClick={(e)=>handlemore(e)} >
-                <svg 
-                  xmlns="http://www.w3.org/2000/svg"
-                  width={16}
-                  height={16}
-                  fill="none"
-                  className="injected-svg"
-                  color="#000"
-                  data-src="https://cdn.hugeicons.com/icons/more-vertical-circle-02-solid-standard.svg"
-                  viewBox="0 0 24 24"
-                >
-                  <path 
-                   data-id={entry.id}
-                    fill="#000"
-                    fillRule="evenodd"
-                    d="M12 22.75C6.063 22.75 1.25 17.937 1.25 12S6.063 1.25 12 1.25 22.75 6.063 22.75 12 17.937 22.75 12 22.75Zm0-16a1.25 1.25 0 1 0 0 2.5h.009a1.25 1.25 0 0 0 0-2.5H12Zm0 4a1.25 1.25 0 1 0 0 2.5h.009a1.25 1.25 0 0 0 0-2.5H12Zm0 4a1.25 1.25 0 1 0 0 2.5h.009a1.25 1.25 0 0 0 0-2.5H12Z"
-                    clipRule="evenodd"
-                  />
-                </svg>
+              <TableCell  >
+                <div className="cursor-pointer mr-2" onMouseEnter={(e) => handlemore(e)}>
+
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width={16}
+                    height={16}
+                    fill="none"
+                    color="#000"
+                    data-src="https://cdn.hugeicons.com/icons/more-vertical-circle-02-solid-standard.svg"
+                    viewBox="0 0 24 24"
+                    data-id={entry.id}
+                  >
+                    <path
+
+                      fill="#000"
+                      fillRule="evenodd"
+                      d="M12 22.75C6.063 22.75 1.25 17.937 1.25 12S6.063 1.25 12 1.25 22.75 6.063 22.75 12 17.937 22.75 12 22.75Zm0-16a1.25 1.25 0 1 0 0 2.5h.009a1.25 1.25 0 0 0 0-2.5H12Zm0 4a1.25 1.25 0 1 0 0 2.5h.009a1.25 1.25 0 0 0 0-2.5H12Zm0 4a1.25 1.25 0 1 0 0 2.5h.009a1.25 1.25 0 0 0 0-2.5H12Z"
+                      clipRule="evenodd"
+                      data-id={entry.id}
+                    />
+                  </svg>
+                </div>
               </TableCell>
 
             </TableRow>

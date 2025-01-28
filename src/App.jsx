@@ -1,45 +1,42 @@
-import { ReactFlow, useNodesState, useEdgesState, addEdge } from '@xyflow/react';
+import { ReactFlow, useNodesState, useEdgesState, addEdge,reconnectEdge } from '@xyflow/react';
 import { DatabaseSchemaNode } from "@/components/database-schema-node";
 import { ZoomSelect } from "@/components/zoom-select";
 import '@xyflow/react/dist/style.css';
 import { AnimatedSVGEdge } from './components/AnimatedSVG';
 import './App.css'
-import { useCallback, useState, useEffect } from 'react';
+import { useCallback, useState, useEffect,useRef} from 'react';
 import { counter } from '../context/context';
 import { v4 as uuidv4 } from 'uuid';
 import { inputscounter } from '../context/context1';
+import connectionline from './components/connectionline';
 function App() {
   const edgeTypes = {
     animatedSvg: AnimatedSVGEdge,
   };
 
 
-  const defaultNodes = [
-
+  const initialNodes = [
   ];
 
-  const defaultEdges = [
-
-  ];
+  const initialEdges = [];
 
   const nodeTypes = {
     databaseSchema: DatabaseSchemaNode,
   };
-
-  const [nodes, setNodes] = useNodesState(defaultNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(defaultEdges);
+  // const defaultEdgeOptions={
+  //   type:"connnectionine"
+  // }
+  const [nodes, setNodes] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const edgeReconnectSuccessful = useRef(true);
   const [inp, setinp] = useState({
     inputname: "",
     inputtype: "",
   })
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
-    [setEdges],
+    [],
   );
-  const defaultEdgeOptions = {
-    type: 'animatedSvg',
-
-  };
   const handleadding = () => {
     setNodes(
       [...nodes, {
@@ -139,14 +136,30 @@ function App() {
     }
   }, [nodes])
 
-  // useEffect(() => {
-  //       localStorage.setItem("edges-data", JSON.stringify(edges))
+  useEffect(() => {
+    // localStorage.setItem("edges-data", JSON.stringify(edges))
+      console.log(edges);
+    return () => {
 
-  //   return () => {
-
-  //   }
-  // }, [edges])
-
+    }
+  }, [edges])
+  
+  const onReconnectStart = useCallback(() => {
+    edgeReconnectSuccessful.current = false;
+  }, []);
+ 
+  const onReconnect = useCallback((oldEdge, newConnection) => {
+    edgeReconnectSuccessful.current = true;
+    setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+  }, []);
+ 
+  const onReconnectEnd = useCallback((_, edge) => {
+    if (!edgeReconnectSuccessful.current) {
+      setEdges((eds) => eds.filter((e) => e.id !== edge.id));
+    }
+ 
+    edgeReconnectSuccessful.current = true;
+  }, []);
   return (
     <>
       <inputscounter.Provider value={{ inp, setinp }}>
@@ -210,15 +223,18 @@ function App() {
 
               <div style={{ height: '100%', width: "100%" }}>
                 <ReactFlow
-                  defaultNodes={defaultNodes}
+                  defaultNodes={initialNodes}
                   edges={edges}
                   onEdgesChange={onEdgesChange}
                   nodes={nodes}
                   onConnect={onConnect}
                   nodeTypes={nodeTypes}
                   edgeTypes={edgeTypes}
-                  defaultEdgeOptions={defaultEdgeOptions}
+                  connectionLineComponent={connectionline}
                   fitView
+                  onReconnect={onReconnect}
+                  onReconnectStart={onReconnectStart}
+                  onReconnectEnd={onReconnectEnd}
                 >
                   <ZoomSelect />
                 </ReactFlow>
