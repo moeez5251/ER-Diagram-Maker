@@ -7,7 +7,6 @@ import './App.css'
 import { useCallback, useState, useEffect,useRef} from 'react';
 import { counter } from '../context/context';
 import { v4 as uuidv4 } from 'uuid';
-import { inputscounter } from '../context/context1';
 import connectionline from './components/connectionline';
 function App() {
   const edgeTypes = {
@@ -23,20 +22,13 @@ function App() {
   const nodeTypes = {
     databaseSchema: DatabaseSchemaNode,
   };
-  // const defaultEdgeOptions={
-  //   type:"connnectionine"
-  // }
+ 
   const [nodes, setNodes] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const edgeReconnectSuccessful = useRef(true);
-  const [inp, setinp] = useState({
-    inputname: "",
-    inputtype: "",
-  })
-  const onConnect = useCallback(
-    (params) => setEdges((eds) => addEdge(params, eds)),
-    [],
-  );
+ 
+  const onConnect = useCallback((params) => 
+    setEdges((eds) => addEdge({ ...params, id: uuidv4() }, eds)), [], );
   const handleadding = () => {
     setNodes(
       [...nodes, {
@@ -51,69 +43,13 @@ function App() {
         },
       }]
     )
-    // localStorage.setItem("data-sets", JSON.stringify(nodes))
   }
-  const inpchange = (e) => {
-    setinp({ ...inp, [e.target.name]: e.target.value })
-  }
-  const handleclick = () => {
-    if (inp.inputname.trim() === "" || inp.inputtype.trim() === "") {
-      return;
-    }
-    const newField = { title: inp.inputname, type: inp.inputtype };
-    let index;
-    setNodes(prevNodes =>
-      prevNodes.map(node => {
-        if (node.id === inp.parent) {
-          index = node.data.schema.findIndex(field => field.id === inp.targetnode);
 
-
-          if (index !== -1) {
-            return {
-              ...node,
-              data: {
-                ...node.data,
-                schema: [
-                  ...node.data.schema.slice(0, index),
-                  ...node.data.schema.slice(index + 1)
-                ]
-              }
-            };
-          }
-        }
-        return node;
-      })
-    );
-    setNodes(prevNodes =>
-      prevNodes.map(node =>
-        node.id === inp.parent
-          ? {
-            ...node,
-            data: {
-              ...node.data,
-              schema: node.data.schema.length === 0
-                ? [newField]
-                : [
-                  ...node.data.schema.slice(0, index),
-                  newField,
-                  ...node.data.schema.slice(index)
-                ]
-            }
-          }
-          : node
-      )
-    );
-    // localStorage.setItem("data-sets", JSON.stringify(nodes))
-    setinp({
-      inputname: "",
-      inputtype: ""
-    })
-  }
   useEffect(() => {
 
     let a = JSON.parse(localStorage.getItem("data-sets"));
     let b = JSON.parse(localStorage.getItem("edges-data"));
-
+      console.log(b);
     if (a) {
       setNodes(a)
     }
@@ -127,18 +63,16 @@ function App() {
   }, [])
 
   useEffect(() => {
-    // setTimeout(() => {
-    //   localStorage.setItem("data-sets", JSON.stringify(nodes))
-    // }, 50);
-    console.log(nodes);
+    setTimeout(() => {
+      localStorage.setItem("data-sets", JSON.stringify(nodes))
+    }, 50);
     return () => {
 
     }
   }, [nodes])
 
+  localStorage.setItem("edges-data", JSON.stringify(edges))
   useEffect(() => {
-    // localStorage.setItem("edges-data", JSON.stringify(edges))
-      console.log(edges);
     return () => {
 
     }
@@ -151,6 +85,7 @@ function App() {
   const onReconnect = useCallback((oldEdge, newConnection) => {
     edgeReconnectSuccessful.current = true;
     setEdges((els) => reconnectEdge(oldEdge, newConnection, els));
+    console.log(edges);
   }, []);
  
   const onReconnectEnd = useCallback((_, edge) => {
@@ -162,64 +97,10 @@ function App() {
   }, []);
   return (
     <>
-      <inputscounter.Provider value={{ inp, setinp }}>
         <counter.Provider value={{ nodes, setNodes }}>
           <div className='bg-[#efedf5] w-full h-full font-ubuntu font-normal'>
-            <div className='flex absolute items-end w-3/6 sm:w-5/6  mx-8  gap-6 top-3  '>
-              <div>
-                <div>
-                  <label className="block text-gray-800 font-semibold text-sm w-fit"
-                  >Input Name</label
-                  >
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="inputname"
-                      className="block w-56 rounded-md py-1.5 px-2 ring-1 ring-inset ring-gray-400 focus:text-gray-800"
-                      placeholder='Change name for record'
-                      onChange={inpchange}
-                      value={inp.inputname}
-                    />
-                  </div>
-                </div>
-
-              </div>
-              <div className='flex items-end gap-4'>
-                <div>
-                  <label className="block text-gray-800 font-semibold text-sm w-fit"
-                  >Input Data Type</label
-                  >
-                  <div className="mt-2">
-                    <input
-                      type="text"
-                      name="inputtype"
-                      className="block w-56 rounded-md py-1.5 px-2 ring-1 ring-inset ring-gray-400 focus:text-gray-800"
-                      placeholder='Change type for record'
-                      onChange={inpchange}
-                      value={inp.inputtype}
-                    />
-                  </div>
-
-                </div>
-                <button onClick={handleclick}
-                  className="flex justify-center gap-2 items-center shadow-xl text-lg bg-gray-50 backdrop-blur-md lg:font-semibold isolation-auto border-gray-50 before:absolute before:w-full before:transition-all before:duration-700 before:hover:w-full before:-left-full before:hover:left-0 before:rounded-full before:bg-blue-800 hover:text-gray-50 before:-z-10 before:aspect-square before:hover:scale-150 before:hover:duration-700 relative z-10 px-3 py-2 overflow-hidden border-2 rounded-full group"
-                >
-                  Save
-                  <svg
-                    className="w-8 h-8 justify-end group-hover:rotate-90 group-hover:bg-gray-50 text-gray-50 ease-linear duration-300 rounded-full border border-gray-700 group-hover:border-none p-2 rotate-45 hidden md:block"
-                    viewBox="0 0 16 19"
-                    xmlns="http://www.w3.org/2000/svg"
-                  >
-                    <path
-                      d="M7 18C7 18.5523 7.44772 19 8 19C8.55228 19 9 18.5523 9 18H7ZM8.70711 0.292893C8.31658 -0.0976311 7.68342 -0.0976311 7.29289 0.292893L0.928932 6.65685C0.538408 7.04738 0.538408 7.68054 0.928932 8.07107C1.31946 8.46159 1.95262 8.46159 2.34315 8.07107L8 2.41421L13.6569 8.07107C14.0474 8.46159 14.6805 8.46159 15.0711 8.07107C15.4616 7.68054 15.4616 7.04738 15.0711 6.65685L8.70711 0.292893ZM9 18L9 1H7L7 18H9Z"
-                      className="fill-gray-800 group-hover:fill-gray-800"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
-
-            </div>
-            <div style={{ boxShadow: "inset rgb(167 167 167 / 54%) 0px -7px 20px 0px" }} className=' drop-shadow-md blur-0 w-11/12 h-[80%]  mx-auto relative top-28 rounded-xl'>
+           
+            <div style={{ boxShadow: "inset rgb(167 167 167 / 54%) 0px -7px 20px 0px" }} className=' drop-shadow-md blur-0 w-11/12 h-[83%]  mx-auto relative top-20 rounded-xl'>
 
               <div style={{ height: '100%', width: "100%" }}>
                 <ReactFlow
@@ -271,7 +152,6 @@ function App() {
 
           </div>
         </counter.Provider>
-      </inputscounter.Provider>
     </>
   )
 }

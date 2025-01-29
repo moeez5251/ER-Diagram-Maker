@@ -2,8 +2,7 @@ import React, { useContext, useState, useRef, useMemo, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import { HandleProps } from "@xyflow/react";
 import { BaseHandle } from "@/components/base-handle";
-import { inputscounter } from "../../context/context1"
-
+import { counter } from "../../context/context"
 const flexDirections = {
   top: "flex-col",
   right: "flex-row-reverse justify-end",
@@ -22,33 +21,57 @@ const LabeledHandle = React.forwardRef<
   }
 >(
   (
-    { className, labelClassName, handleClassName, type, title, position, ...props },
+    { className, labelClassName, handleClassName, type, title, position, id, ...props },
     ref
   ) => {
     const [label, setLabel] = useState(title);
-    const countervalue1 = useContext(inputscounter)
-
-
+    const countervalue = useContext(counter)
     const handleChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
-      const parentelement = event.target.parentElement.parentElement.parentElement;
-      const name = parentelement.firstElementChild.firstElementChild.getAttribute("title");
-      const type = parentelement.lastElementChild.firstElementChild.getAttribute("title");
+      const row_id = event.target.parentElement.parentElement.parentElement.id
+      const tableid = event.target.parentElement.parentElement.parentElement.parentElement.getAttribute("data-id");
+      const newValue = event.target.value;
+      countervalue.setNodes(prevNodes =>
+        prevNodes.map(node => {
+          if (node.id !== tableid) return node;
 
-      let parent = event.target.parentElement.parentElement.parentNode.parentNode.parentElement.parentElement.parentNode.firstElementChild.firstElementChild.id;
-      const targetnode = event.target.parentElement.parentElement.parentElement.id;
-      console.log(parent, targetnode);
-      countervalue1.setinp((prev) => ({
-        ...prev,
-        inputname: name,
-        inputtype: type,
-        parent: parent,
-        targetnode: targetnode
-      }));
+          let schemaChanged = false;
+          const newSchema = node.data.schema.map(field => {
+            if (field.id === row_id) {
+              if (field.title === newValue) return field;
+              schemaChanged = true;
+              return { ...field, title: newValue };
 
+            }
+            return field;
+          });
+
+          if (!schemaChanged) return node;
+
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              schema: newSchema,
+            },
+          };
+        })
+      );
+      sessionStorage.setItem('rowid', row_id);
     };
+    useEffect(() => {
+      let a = sessionStorage.getItem('rowid');
+      if (a) {
+        const inputElement = document.querySelector(`input[data-idname="${a}"]`) as HTMLInputElement;
+        if (inputElement) {
+          inputElement.focus();
+        }
+      }
+    }, []);
+
+
     return (
       <div
-        ref={ref}
+        ref=  {ref}
         title={label}
         style={{ boxShadow: "inset 1px 1px 6px 0px #7a7a7a" }}
         className={cn(
@@ -57,23 +80,19 @@ const LabeledHandle = React.forwardRef<
           className
         )}
       >
-        <BaseHandle position={position} className={handleClassName} {...props} />
-        <BaseHandle position="left" type="target" className={handleClassName} {...props} />
-        {/* <div style={{ background: "none" }}
+        <BaseHandle  position={position} className={handleClassName} {...props} />
+        <BaseHandle   position="left" type="target" className={handleClassName} {...props} />
+        <input
+          style={{ background: "none" }}
+          type="text"
+          onChange={handleChange}
+          data-idname={id}
           className={cn(
-            "",
+            "bg-transparent border-none outline-none w-4/5 ",
             labelClassName
-          )}
-        >
-          {label}
-
-        </div> */}
-        <input style={{background:"none"}} type="text" className={cn(
-          "bg-transparent border-none outline-none w-4/5",
-          labelClassName
-        )}  value={label}/>
+          )} value={label} />
       </div>
-    );
+    ); 
   }
 );
 

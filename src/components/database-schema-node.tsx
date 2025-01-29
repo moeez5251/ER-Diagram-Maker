@@ -21,12 +21,23 @@ export function DatabaseSchemaNode({
   const countervalue = useContext(counter)
   const [label, setLabel] = useState(data.label);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    for (const nodes of countervalue.nodes) {
-      if (nodes.id === event.target.parentElement.parentElement.getAttribute("data-id")) {
-        nodes.data.label = event.target.value;
-      }
-    }
     setLabel(event.target.value);
+    console.log(event.target);
+    sessionStorage.setItem('rowid', event.target.id);
+    countervalue.setNodes(prevNodes =>
+      prevNodes.map(node => {
+        if (node.id === event.target.id) {
+          return {
+            ...node,
+            data: {
+              ...node.data,
+              label: event.target.value
+            }
+          };
+        }
+        return node;
+      })
+    );
   };
   const handlerowclick = async (event: React.ChangeEvent<HTMLElement>) => {
     const rowid = event.target.parentElement.parentElement.parentElement.parentElement.id;
@@ -116,7 +127,7 @@ export function DatabaseSchemaNode({
     }
   }, [positionAbsoluteX])
   return (
-    <BaseNode className="bg-gray-200 py-2 rounded-md w-44 relative before:w-1 before:h-6 before:bg-orange-800  before:z-10 before:absolute before:block before:rounded-lg before:left-[0.5px] before:top-[7px] shadow-lg " selected={selected}>
+    <BaseNode  className="bg-gray-200 py-2 rounded-md w-44 relative before:w-1 before:h-6 before:bg-orange-800  before:z-10 before:absolute before:block before:rounded-lg before:left-[0.5px] before:top-[7px] shadow-lg " selected={selected}>
       <div className="flex items-center px-3 w-full">
 
         <input
@@ -124,7 +135,7 @@ export function DatabaseSchemaNode({
           onClick={() => console.log(selected)}
           className="bg-transparent font-bold border-none outline-none text-sm w-[90%] "
           type="text"
-          value={"produts"}
+          value={label}
           id={id}
         />
         <div className="cursor-pointer">
@@ -147,16 +158,15 @@ export function DatabaseSchemaNode({
         </div>
       </div>
       <table className="border-spacing-10  w-full overflow-hidden">
-        <TableBody>
+        <TableBody data-id={id}>
           {data.schema.map((entry) => (
-            <TableRow key={uuidv4()} id={entry.id} className=" text-xs overflow-hidden m-2 relative transition-all right-0 ">
+            <TableRow key={entry.id} id={entry.id} className=" text-xs overflow-hidden m-2 relative transition-all right-0 ">
 
               <TableCell className="w-[95%]"  >
                 <LabeledHandle
-                  id={entry.id}
+                  id={entry.id} 
                   title={entry.title}
                   type="source"
-                  
                   position={Position.Right}
                   handleClassName="p-0"
                   labelClassName="p-0"

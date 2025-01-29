@@ -158,7 +158,7 @@ function NodeInfo({
       style={{
         position: "'absolute'",
         transform: absoluteTransform,
-        width: width * 2,
+        width: width * 2, 
       }}
       className="'text-xs'"
     >

@@ -9,8 +9,6 @@ export const BaseNode = React.forwardRef<
     ref={ref}
     className={cn(
       className,
-      // selected ? "border-neutral-500 shadow-lg dark:border-neutral-40" : "",
-      // "hover:ring-1",
     )}
     tabIndex={0}
     {...props}

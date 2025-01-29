@@ -11,7 +11,7 @@ export default ({ fromX, fromY, toX, toY }) => {
         stroke={fromHandle.id}
         strokeWidth={1.5}
         className="animated"
-        d={`M${fromX},${fromY} C ${fromX} ${toY} ${fromX} ${toY} ${toX},${toY}`}
+        d={`M ${fromX},${fromY} C ${fromX} ${toY} ${fromX} ${toY} ${toX},${toY}`}
       />
       <circle
         cx={toX}
