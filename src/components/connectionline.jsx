@@ -1,24 +1,30 @@
 import React from 'react';
 import { useConnection } from '@xyflow/react';
- 
-export default ({ fromX, fromY, toX, toY }) => {
+
+export default ({ fromX = 0, fromY = 0, toX = 0, toY = 0 }) => {
   const { fromHandle } = useConnection();
- 
+
+  const validFromX = !isNaN(fromX) ? fromX : 0;
+  const validFromY = !isNaN(fromY) ? fromY : 0;
+  const validToX = !isNaN(toX) ? toX : 0;
+  const validToY = !isNaN(toY) ? toY : 0;
+
+  const strokeColor = fromHandle?.id || '#000';
   return (
     <g>
       <path
         fill="none"
-        stroke={fromHandle.id}
+        stroke={strokeColor}
         strokeWidth={1.5}
         className="animated"
-        d={`M ${fromX},${fromY} C ${fromX} ${toY} ${fromX} ${toY} ${toX},${toY}`}
+        d={`M ${validFromX},${validFromY} C ${validFromX} ${validToY} ${validFromX} ${validToY} ${validToX},${validToY}`}
       />
       <circle
-        cx={toX}
-        cy={toY}
+        cx={validToX}
+        cy={validToY}
         fill="#fff"
         r={3}
-        stroke={fromHandle.id}
+        stroke={strokeColor}
         strokeWidth={1.5}
       />
     </g>

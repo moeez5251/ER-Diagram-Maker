@@ -30,6 +30,8 @@ const LabeledHandle = React.forwardRef<
       const row_id = event.target.parentElement.parentElement.parentElement.id
       const tableid = event.target.parentElement.parentElement.parentElement.parentElement.getAttribute("data-id");
       const newValue = event.target.value;
+      setLabel(newValue)
+      
       countervalue.setNodes(prevNodes =>
         prevNodes.map(node => {
           if (node.id !== tableid) return node;
@@ -66,6 +68,7 @@ const LabeledHandle = React.forwardRef<
           inputElement.focus();
         }
       }
+    
     }, []);
 
 
@@ -80,8 +83,8 @@ const LabeledHandle = React.forwardRef<
           className
         )}
       >
-        <BaseHandle  position={position} className={handleClassName} {...props} />
-        <BaseHandle   position="left" type="target" className={handleClassName} {...props} />
+        <BaseHandle id={`source-${id}`}  position={position} className={handleClassName} {...props} />
+        <BaseHandle  id={`target-${id}`}  position="left" type="target" className={handleClassName} {...props} />
         <input
           style={{ background: "none" }}
           type="text"

@@ -6,7 +6,7 @@ export default {
     "./src/**/*.{js,ts,jsx,tsx}",
   ],
   safelist: [
-    'right-10', 
+    'right-10','-right-1' 
   ],
   theme: {
   	extend: {

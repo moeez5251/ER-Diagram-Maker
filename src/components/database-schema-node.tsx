@@ -100,34 +100,39 @@ export function DatabaseSchemaNode({
   const handlemore = (e) => {
     if (document.getElementById(e.target.getAttribute("data-id"))) {
       document.getElementById(e.target.getAttribute("data-id")).classList.toggle("right-animate")
+      setTimeout(() => {
+        if (document.getElementById(e.target.getAttribute("data-id")).classList.contains("right-animate")) {
+          document.getElementById(e.target.getAttribute("data-id")).classList.remove("right-animate")
+        }
+
+      }, 4000);
     }
   }
+
+
   useEffect(() => {
-    if (NaN) {
+    if (isNaN(positionAbsoluteX) || isNaN(positionAbsoluteY)) {
       return;
     }
-    if (positionAbsoluteX) {
+      
       countervalue.setNodes(prevNodes =>
         prevNodes.map(node =>
           node.id === id
             ? {
-              ...node,
-              position: {
-
-                x: positionAbsoluteX.toFixed(2),
-                y: positionAbsoluteY.toFixed(2)
+                ...node,
+                position: {
+                  x: positionAbsoluteX.toFixed(1),
+                  y: positionAbsoluteY.toFixed(1)
+                }
               }
-            }
             : node
         )
       );
-    }
-    return () => {
 
-    }
-  }, [positionAbsoluteX])
+  }, [positionAbsoluteX, positionAbsoluteY]); 
+
   return (
-    <BaseNode  className="bg-gray-200 py-2 rounded-md w-44 relative before:w-1 before:h-6 before:bg-orange-800  before:z-10 before:absolute before:block before:rounded-lg before:left-[0.5px] before:top-[7px] shadow-lg " selected={selected}>
+    <BaseNode className="bg-gray-200 py-2 rounded-md w-44 relative before:w-1 before:h-6 before:bg-orange-800  before:z-10 before:absolute before:block before:rounded-lg before:left-[0.5px] before:top-[7px] shadow-lg " selected={selected}>
       <div className="flex items-center px-3 w-full">
 
         <input
@@ -164,7 +169,7 @@ export function DatabaseSchemaNode({
 
               <TableCell className="w-[95%]"  >
                 <LabeledHandle
-                  id={entry.id} 
+                  id={entry.id}
                   title={entry.title}
                   type="source"
                   position={Position.Right}
