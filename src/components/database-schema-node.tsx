@@ -15,14 +15,11 @@ export function DatabaseSchemaNode({
   data,
   selected,
   id,
-  positionAbsoluteX,
-  positionAbsoluteY
 }: NodeProps<DatabaseSchemaNode>) {
   const countervalue = useContext(counter)
   const [label, setLabel] = useState(data.label);
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setLabel(event.target.value);
-    console.log(event.target);
     sessionStorage.setItem('rowid', event.target.id);
     countervalue.setNodes(prevNodes =>
       prevNodes.map(node => {
@@ -68,6 +65,13 @@ export function DatabaseSchemaNode({
         );
 
       }
+      const sourceid = event.target.parentElement.parentElement.parentElement.parentElement.firstElementChild.firstElementChild.firstElementChild.getAttribute("data-handleid");
+      const targerid = event.target.parentElement.parentElement.parentElement.parentElement.firstElementChild.firstElementChild.children[1].getAttribute("data-handleid");
+      countervalue.setEdges((prevEdges) =>
+        prevEdges.filter(
+          (edge) => edge.sourceHandle !== sourceid && edge.targetHandle !== targerid
+        )
+      );
     }
   }
   const handleclick = (event: React.ChangeEvent<HTMLElement>) => {
@@ -101,49 +105,32 @@ export function DatabaseSchemaNode({
     if (document.getElementById(e.target.getAttribute("data-id"))) {
       document.getElementById(e.target.getAttribute("data-id")).classList.toggle("right-animate")
       setTimeout(() => {
-        if (document.getElementById(e.target.getAttribute("data-id")).classList.contains("right-animate")) {
-          document.getElementById(e.target.getAttribute("data-id")).classList.remove("right-animate")
+        if (document.getElementById(e.target.getAttribute("data-id"))) {
+          document.getElementById(e.target.getAttribute("data-id")).classList.contains("right-animate") ?
+            document.getElementById(e.target.getAttribute("data-id")).classList.remove("right-animate") : ""
         }
 
       }, 4000);
     }
   }
 
-
-  useEffect(() => {
-    if (isNaN(positionAbsoluteX) || isNaN(positionAbsoluteY)) {
-      return;
-    }
-      
-      countervalue.setNodes(prevNodes =>
-        prevNodes.map(node =>
-          node.id === id
-            ? {
-                ...node,
-                position: {
-                  x: positionAbsoluteX.toFixed(1),
-                  y: positionAbsoluteY.toFixed(1)
-                }
-              }
-            : node
-        )
-      );
-
-  }, [positionAbsoluteX, positionAbsoluteY]); 
-
+  const deletetable = () => {
+    countervalue.setNodes((prevNodes) => prevNodes.filter((node) => node.id !== id));
+    countervalue.setEdges((prevEdges) => prevEdges.filter((edge) => edge.source !== id && edge.target !== id));
+  }
+  
   return (
-    <BaseNode className="bg-gray-200 py-2 rounded-md w-44 relative before:w-1 before:h-6 before:bg-orange-800  before:z-10 before:absolute before:block before:rounded-lg before:left-[0.5px] before:top-[7px] shadow-lg " selected={selected}>
+    <BaseNode  className="bg-gray-200 py-2 rounded-md w-44 relative before:w-1 before:h-6 before:bg-cyan-300  before:z-10 before:absolute before:block before:rounded-lg before:left-[0.5px] before:top-[7px] shadow-lg " selected={selected}>
       <div className="flex items-center px-3 w-full">
 
         <input
           onChange={handleChange}
-          onClick={() => console.log(selected)}
           className="bg-transparent font-bold border-none outline-none text-sm w-[90%] "
           type="text"
           value={label}
           id={id}
         />
-        <div className="cursor-pointer">
+        <div onClick={deletetable} title="delete table" className="cursor-pointer">
 
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -151,13 +138,21 @@ export function DatabaseSchemaNode({
             height={16}
             fill="none"
             className="injected-svg"
-            color="#000"
-            data-src="https://cdn.hugeicons.com/icons/more-horizontal-circle-01-solid-standard.svg"
+            color="#f80909"
+            data-src="https://cdn.hugeicons.com/icons/delete-02-solid-standard.svg"
             viewBox="0 0 24 24"
           >
             <path
-              fill="#000"
-              d="M17 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0ZM9.5 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0ZM2 12a2.5 2.5 0 1 0 5 0 2.5 2.5 0 0 0-5 0Z"
+              fill="#f80909"
+              fillRule="evenodd"
+              d="M4.638 20.166 3.824 6.752l-.09-1.685a.3.3 0 0 1 .3-.316h15.96a.3.3 0 0 1 .3.321l-.118 1.68-.813 13.415a2.75 2.75 0 0 1-2.745 2.584H7.382a2.75 2.75 0 0 1-2.744-2.584ZM8.75 16.5a.75.75 0 0 0 1.5 0v-6a.75.75 0 1 0-1.5 0v6Zm5.75-6.75a.75.75 0 0 1 .75.75v6a.75.75 0 0 1-1.5 0v-6a.75.75 0 0 1 .75-.75Z"
+              clipRule="evenodd"
+            />
+            <path
+              fill="#f80909"
+              fillRule="evenodd"
+              d="M8.319 2.463a2 2 0 0 1 1.838-1.212h3.681a2 2 0 0 1 1.839 1.212l.98 2.287h2.807a.759.759 0 0 1 .066 0h1.468a1 1 0 1 1 0 2h-18a1 1 0 1 1 0-2h1.467a.759.759 0 0 1 .067 0h2.806l.98-2.287Zm5.571.909.591 1.378H9.514l.591-1.378a.2.2 0 0 1 .184-.121h3.417a.2.2 0 0 1 .184.12Z"
+              clipRule="evenodd"
             />
           </svg>
         </div>
@@ -165,7 +160,7 @@ export function DatabaseSchemaNode({
       <table className="border-spacing-10  w-full overflow-hidden">
         <TableBody data-id={id}>
           {data.schema.map((entry) => (
-            <TableRow key={entry.id} id={entry.id} className=" text-xs overflow-hidden m-2 relative transition-all right-0 ">
+            <TableRow key={entry.id} id={entry.id} className=" text-xs overflow-hidden m-2 relative transition-all right-0  ">
 
               <TableCell className="w-[95%]"  >
                 <LabeledHandle

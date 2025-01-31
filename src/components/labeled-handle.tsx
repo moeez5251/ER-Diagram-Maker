@@ -91,7 +91,7 @@ const LabeledHandle = React.forwardRef<
           onChange={handleChange}
           data-idname={id}
           className={cn(
-            "bg-transparent border-none outline-none w-4/5 ",
+            "bg-transparent border-none outline-none w-4/5",
             labelClassName
           )} value={label} />
       </div>

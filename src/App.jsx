@@ -1,9 +1,9 @@
-import { ReactFlow, useNodesState, useEdgesState, addEdge, reconnectEdge } from '@xyflow/react';
+import { ReactFlow, useNodesState, useEdgesState, addEdge, reconnectEdge} from '@xyflow/react';
 import { DatabaseSchemaNode } from "@/components/database-schema-node";
 import { ZoomSelect } from "@/components/zoom-select";
 import '@xyflow/react/dist/style.css';
 import './App.css'
-import { useCallback, useState, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { counter } from '../context/context';
 import { v4 as uuidv4 } from 'uuid';
 import connectionline from './components/connectionline';
@@ -19,7 +19,7 @@ function App() {
   };
 
   const [nodes, setNodes] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [edges, setEdges,onEdgesChange] = useEdgesState(initialEdges);
   const edgeReconnectSuccessful = useRef(true);
   const onConnect = useCallback((params) => {
     setEdges((eds) => addEdge({ ...params, id: uuidv4() }, eds));
@@ -29,7 +29,7 @@ function App() {
     setNodes(
       [...nodes, {
         id: uuidv4(),
-        position: { x: Math.floor(Math.random() * (350 - 200 + 1)) + 200, y: Math.floor(Math.random() * (350 - 200 + 1)) + 200 },
+        position: { x: Math.floor(Math.random() * (200 - 100 + 1)) + 100, y: Math.floor(Math.random() * (200 - 100 + 1)) + 100 },
         type: "databaseSchema",
         data: {
           label: "db",
@@ -45,7 +45,6 @@ function App() {
 
     let a = JSON.parse(localStorage.getItem("data-sets"));
     let b = JSON.parse(localStorage.getItem("edges-data"));
-    console.log(b);
     if (a) {
       setNodes(a)
     }
@@ -90,9 +89,12 @@ function App() {
 
     edgeReconnectSuccessful.current = true;
   }, []);
+
+
+  
   return (
     <>
-      <counter.Provider value={{ nodes, setNodes }}>
+      <counter.Provider value={{ nodes, setNodes,edges,setEdges }}>
         <div className='bg-[#efedf5] w-full h-full font-ubuntu font-normal'>
 
           <div style={{ boxShadow: "inset rgb(167 167 167 / 54%) 0px -7px 20px 0px" }} className=' drop-shadow-md blur-0 w-11/12 h-[83%]  mx-auto relative top-20 rounded-xl'>
@@ -110,7 +112,27 @@ function App() {
                 onReconnect={onReconnect}
                 onReconnectStart={onReconnectStart}
                 onReconnectEnd={onReconnectEnd}
+              
+               onNodeDragStop = {(event, node) => {
+                  setNodes(prevNodes =>
+                    prevNodes.map(n =>
+                      n.id === node.id
+                        ? {
+                            ...n,
+                            position: {
+                              x: node.position.x,  
+                              y: node.position.y
+                            }
+                          }
+                        : n
+                    )
+                  );
+                }}
+              
+                
+                
               >
+                
                 <ZoomSelect />
               </ReactFlow>
             </div>
